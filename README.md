@@ -1,7 +1,7 @@
 # Correcaminxs-app
 # 🛣️ Cotizador Correcaminos
 
-**Cotizador Correcaminos** es una herramienta web diseñada para calcular de manera rápida y eficiente el costo de recorridos basados en la distancia y tarifas personalizadas.
+**Cotizador Correcaminos** es una herramienta web diseñada para calcular de manera rápida y eficiente el costo de recorridos basados en la distancia y tarifas personalizadas, para la ciudad de tandil,(provincia de buenos aires, argentina) y sujeto a criterios del creador (ciretios no estandarizados).
 
 ## ✨ Características
 * Cálculo automático de precios por kilómetro.
