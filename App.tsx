@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
-importt { 
+import { 
   Calculator, 
   MapPin, 
   DollarSign, 
