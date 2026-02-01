@@ -1,21 +1,20 @@
-# Correcaminxs-app
-# 🛣️ Cotizador Correcaminos
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
 
-**Cotizador Correcaminos** es una herramienta web diseñada para calcular de manera rápida y eficiente el costo de recorridos basados en la distancia y tarifas personalizadas, para la ciudad de tandil,(provincia de buenos aires, argentina) y sujeto a criterios del creador (ciretios no estandarizados).
+# Run and deploy your AI Studio app
 
-## ✨ Características
-* Cálculo automático de precios por kilómetro.
-* Interfaz intuitiva y fácil de usar para clientes.
-* Optimizado para dispositivos móviles.
+This contains everything you need to run your app locally.
 
-## ⚖️ Licencia y Aspectos Legales
-Este proyecto está bajo la **Licencia Apache 2.0**.
+View your app in AI Studio: https://ai.studio/apps/drive/13Foctktd3SD5Zp3Fn2CQR8dHGK4hg8NI
 
-### 🛑 Descargo de Responsabilidad (Disclaimer)
-Esta aplicación se proporciona "tal cual" (as-is), únicamente con fines informativos y de cotización estimativa. 
-* **Precisión:** El propietario no garantiza que los cálculos sean exactos en todas las circunstancias (variaciones de rutas, peajes, etc.).
-* **Responsabilidad:** El autor no se hace responsable por pérdidas financieras o errores derivados del uso de esta herramienta. Es responsabilidad del usuario final verificar y validar el monto total antes de formalizar cualquier transacción comercial.
+## Run Locally
 
----
-Desarrollado con el apoyo de IA y tecnología de código abierto.
-Proyecto_app_cotizador_logistico
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
