@@ -15,7 +15,7 @@ export interface Quote {
   origin: Location;
   destination: Location;
   clientName: string;
-  senderPhone: string;
+  deliveryTime: string; // Nuevo campo para el horario
   recipientPhone: string;
   description: string;
   dwellingType: DwellingType;

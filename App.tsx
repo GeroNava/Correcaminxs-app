@@ -25,7 +25,8 @@ import {
   FileSpreadsheet,
   ClipboardList,
   Compass,
-  CloudSun
+  CloudSun,
+  Clock
 } from 'lucide-react';
 import MapComponent from './components/MapComponent.tsx';
 import { Location, Quote, TariffType, DwellingType, PaymentMethod } from './types.ts';
@@ -33,7 +34,7 @@ import { calculateShippingFee, estimateTime, geocodeAddress, getRouteData, check
 
 const App: React.FC = () => {
   const [clientName, setClientName] = useState('');
-  const [senderPhone, setSenderPhone] = useState('');
+  const [deliveryTime, setDeliveryTime] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
   const [recipientPhone, setRecipientPhone] = useState('');
   const [description, setDescription] = useState('');
   
@@ -74,7 +75,7 @@ const App: React.FC = () => {
     setOriginAddr('');
     setDestAddr('');
     setRecipientPhone('');
-    setSenderPhone('');
+    setDeliveryTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }));
     setClientName('');
     setDescription('');
     setDwellingDetail('');
@@ -130,7 +131,7 @@ const App: React.FC = () => {
       origin: currentOrigin,
       destination: currentDest,
       clientName,
-      senderPhone,
+      deliveryTime,
       recipientPhone,
       description,
       dwellingType,
@@ -155,8 +156,8 @@ const App: React.FC = () => {
   };
 
   const exportQuoteToCSV = (quote: Quote) => {
-    const headers = "ID,Fecha,Cliente,Origen,Destino,Vivienda,Tel Remitente,Tel Destinatario,Distancia (Km),Envio,Mercaderia,Total,Metodo Pago,Notas\n";
-    const row = `${quote.id},${quote.timestamp},"${quote.clientName}","${quote.origin.address}","${quote.destination.address}",${quote.dwellingType},${quote.senderPhone},${quote.recipientPhone},${quote.distanceKm},${quote.shippingFee},${quote.collectAmount},${quote.totalToCollect},${quote.paymentMethod},"${quote.description.replace(/\n/g, ' ')}"\n`;
+    const headers = "ID,Fecha,Horario,Cliente,Origen,Destino,Vivienda,Tel Destinatario,Distancia (Km),Envio,Mercaderia,Total,Metodo Pago,Notas\n";
+    const row = `${quote.id},${quote.timestamp},${quote.deliveryTime},"${quote.clientName}","${quote.origin.address}","${quote.destination.address}",${quote.dwellingType},${quote.recipientPhone},${quote.distanceKm},${quote.shippingFee},${quote.collectAmount},${quote.totalToCollect},${quote.paymentMethod},"${quote.description.replace(/\n/g, ' ')}"\n`;
     
     const blob = new Blob(["\ufeff" + headers + row], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -170,9 +171,9 @@ const App: React.FC = () => {
 
   const exportHistoryToCSV = () => {
     if (history.length === 0) return;
-    const headers = "ID,Fecha,Cliente,Origen,Destino,Vivienda,Tel Remitente,Tel Destinatario,Distancia,Envio,Mercaderia,Total,Metodo,Notas\n";
+    const headers = "ID,Fecha,Horario,Cliente,Origen,Destino,Vivienda,Tel Destinatario,Distancia,Envio,Mercaderia,Total,Metodo,Notas\n";
     const rows = history.map(q => 
-      `${q.id},${q.timestamp},"${q.clientName}","${q.origin.address}","${q.destination.address}",${q.dwellingType},${q.senderPhone},${q.recipientPhone},${q.distanceKm},${q.shippingFee},${q.collectAmount},${q.totalToCollect},${q.paymentMethod},"${q.description.replace(/\n/g, ' ')}"`
+      `${q.id},${q.timestamp},${q.deliveryTime},"${q.clientName}","${q.origin.address}","${q.destination.address}",${q.dwellingType},${q.recipientPhone},${q.distanceKm},${q.shippingFee},${q.collectAmount},${q.totalToCollect},${q.paymentMethod},"${q.description.replace(/\n/g, ' ')}"`
     ).join("\n");
     
     const blob = new Blob(["\ufeff" + headers + rows], { type: 'text/csv;charset=utf-8;' });
@@ -197,7 +198,7 @@ const App: React.FC = () => {
 
   const loadFromHistory = (quote: Quote) => {
     setClientName(quote.clientName);
-    setSenderPhone(quote.senderPhone);
+    setDeliveryTime(quote.deliveryTime);
     setRecipientPhone(quote.recipientPhone);
     setDescription(quote.description);
     setOriginAddr(quote.origin.address || '');
@@ -226,9 +227,9 @@ const App: React.FC = () => {
     let mensajeFinal = `🚀 *SOLICITUD DE DELIVERY - CORRECAMINXS*\n\n`;
     mensajeFinal += `📦 *Datos del Pedido:*\n`;
     mensajeFinal += `• Cliente: ${activeQuote.clientName || 'S/N'}\n`;
+    mensajeFinal += `🕒 *Horario solicitado: ${activeQuote.deliveryTime}*\n`;
     mensajeFinal += `📍 Origen: ${activeQuote.origin.address}\n`;
     mensajeFinal += `📍 Destino: ${activeQuote.destination.address}\n`;
-    mensajeFinal += `📞 Tel. Remitente: ${activeQuote.senderPhone || 'S/N'}\n`;
     mensajeFinal += `📞 Tel. Destinatario: ${activeQuote.recipientPhone || 'S/N'}\n`;
     mensajeFinal += `📏 Distancia: ${distIdaVuelta} km (ida y vuelta)\n`;
     mensajeFinal += `💰 Costo del envío: $${activeQuote.shippingFee.toLocaleString()}\n`;
@@ -320,7 +321,6 @@ const App: React.FC = () => {
                 </div>
                 <div className="space-y-2">
                   <input type="text" value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Nombre del Local / Negocio" className="w-full px-4 py-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl font-bold placeholder:text-slate-700 focus:border-violet-600 focus:bg-slate-900/60 outline-none transition-all duration-300 shadow-sm" />
-                  <input type="text" value={senderPhone} onChange={(e) => setSenderPhone(e.target.value)} placeholder="Teléfono del Remitente" className="w-full px-4 py-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl font-bold placeholder:text-slate-700 focus:border-violet-600 focus:bg-slate-900/60 outline-none transition-all duration-300 shadow-sm" />
                 </div>
               </section>
 
@@ -366,7 +366,6 @@ const App: React.FC = () => {
                 </div>
               </section>
 
-              {/* RECORDATORIO TARIFARIO (VERDE Y AMIGABLE) */}
               <div className="bg-emerald-600/20 p-4 rounded-2xl flex items-center gap-3 border border-emerald-500/30 animate-in slide-in-from-top-2 duration-500">
                 <div className="bg-emerald-500/20 p-2 rounded-lg">
                   <Info size={18} className="text-emerald-400" />
@@ -376,16 +375,32 @@ const App: React.FC = () => {
                 </p>
               </div>
 
-              <section className="space-y-3">
-                <div className="flex items-center gap-2 text-violet-400 font-black text-[11px] uppercase tracking-widest">
-                  <ClipboardList size={16} /> Descripción del Envío
+              <section className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-violet-400 font-black text-[11px] uppercase tracking-widest">
+                    <Clock size={16} /> Horario del Pedido
+                  </div>
+                  <div className="relative overflow-hidden rounded-[2rem] border border-slate-800">
+                    <input 
+                      type="time" 
+                      value={deliveryTime} 
+                      onChange={(e) => setDeliveryTime(e.target.value)} 
+                      className="w-full px-6 py-8 bg-black font-black text-6xl text-center text-white focus:border-violet-600 outline-none transition-all cursor-pointer shadow-2xl shadow-black/60"
+                    />
+                  </div>
                 </div>
-                <textarea 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  placeholder="Levantar paquete en.." 
-                  className="w-full px-4 py-4 bg-slate-900/30 border border-slate-800/80 rounded-2xl font-bold placeholder:text-slate-700 focus:border-violet-600 focus:bg-slate-900/60 outline-none transition-all min-h-[80px] resize-none"
-                />
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-violet-400 font-black text-[11px] uppercase tracking-widest">
+                    <ClipboardList size={16} /> Descripción del Envío
+                  </div>
+                  <textarea 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    placeholder="Detalles adicionales del paquete o retiro..." 
+                    className="w-full px-5 py-6 bg-slate-900/30 border border-slate-800/80 rounded-[2rem] font-bold placeholder:text-slate-700 focus:border-violet-600 focus:bg-slate-900/60 outline-none transition-all min-h-[120px] resize-none text-lg leading-relaxed"
+                  />
+                </div>
               </section>
 
               <section className="space-y-4">
@@ -524,6 +539,7 @@ const App: React.FC = () => {
              <div className="space-y-6 text-sm">
                 <div className="flex justify-between font-black border-b border-dashed border-black pb-2">
                   <span>FECHA: {activeQuote.timestamp}</span>
+                  <span>HORA: {activeQuote.deliveryTime}</span>
                   <span>ID: #{activeQuote.id}</span>
                 </div>
                 <div className="space-y-3">
@@ -531,7 +547,6 @@ const App: React.FC = () => {
                     <p className="font-black text-[10px] uppercase text-gray-500 mb-1">REMITENTE (CLIENTE)</p>
                     <p className="font-bold uppercase text-lg">{activeQuote.clientName || 'S/N'}</p>
                     <p className="text-sm">📍 {activeQuote.origin.address}</p>
-                    <p className="text-[10px] font-bold mt-1">📞 Tel: {activeQuote.senderPhone || 'S/N'}</p>
                   </div>
                   <div className="bg-gray-100 p-3 rounded">
                     <p className="font-black text-[10px] uppercase text-gray-500 mb-1">DESTINATARIO</p>
@@ -578,6 +593,21 @@ const App: React.FC = () => {
           color: white !important;
           padding: 12px;
           font-weight: 700;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+          cursor: pointer;
+          height: 100%;
+          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          opacity: 0;
+        }
+        
+        input[type="time"] {
+          position: relative;
         }
 
         @media print {
