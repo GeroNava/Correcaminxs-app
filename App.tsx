@@ -588,6 +588,7 @@ const App: React.FC = () => {
           @page { size: auto; margin: 0; }
         }
       `}</style>
+      <Analytics />
     </div>
   );
 };
