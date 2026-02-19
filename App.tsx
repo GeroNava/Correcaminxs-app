@@ -224,7 +224,7 @@ const App: React.FC = () => {
     setRouteGeometry(null); 
   };
 
-  const sendWhatsApp = async () => {
+  const sendWhatsApp = () => {
     if (!activeQuote) return;
     
     const pago = activeQuote.paymentMethod === 'cash' ? '💸 COBRAR EN EFECTIVO' : '💳 TRANSFERENCIA';
