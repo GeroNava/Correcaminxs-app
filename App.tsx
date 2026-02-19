@@ -256,7 +256,7 @@ const App: React.FC = () => {
     // GUARDAR CONSULTA EN LA BASE DE DATOS
   try {
     const idPedido = `pedido-${Date.now()}`;
-    kv.set(idPedido, {
+    await kv.set(idPedido, {
       cliente: activeQuote?.clientName || 'Cliente General',
       origen: activeQuote?.origin?.address || 'No especificado',
       destino: activeQuote?.destination?.address || 'No especificado',
