@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { 
   Calculator, 
   MapPin, 
@@ -587,6 +588,7 @@ const App: React.FC = () => {
           @page { size: auto; margin: 0; }
         }
       `}</style>
+      <Analytics />
     </div>
   );
 };
