@@ -1,7 +1,13 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
-import { kv } from '@vercel/kv';
+// prueba
+import { createClient } from '@vercel/kv';
+
+const kv = createClient({
+  url: process.env.STORAGE_REST_API_URL,
+  token: process.env.STORAGE_REST_API_TOKEN,
+});
 import { 
   Calculator, 
   MapPin, 
@@ -218,7 +224,7 @@ const App: React.FC = () => {
     setRouteGeometry(null); 
   };
 
-  const sendWhatsApp = () => {
+  const sendWhatsApp = async () => {
     if (!activeQuote) return;
     
     const pago = activeQuote.paymentMethod === 'cash' ? '💸 COBRAR EN EFECTIVO' : '💳 TRANSFERENCIA';
@@ -252,21 +258,21 @@ const App: React.FC = () => {
     
     mensajeFinal += `⏳ *Aguarda unos instantes mientras el operador confirma tu solicitud y el costo final del envío.*\n`;
     mensajeFinal += `🏁 *¡Gracias por utilizar Correcaminxs!*`;
-    
-    // GUARDAR CONSULTA EN LA BASE DE DATOS
-  try {
-    const idPedido = `pedido-${Date.now()}`;
-    kv.set(idPedido, {
-      cliente: activeQuote?.clientName || 'Cliente General',
-      origen: activeQuote?.origin?.address || 'No especificado',
-      destino: activeQuote?.destination?.address || 'No especificado',
-      monto: activeQuote?.shippingFee || 0,
-      metodoPago: paymentMethod,
-      fecha: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })
-    });
-  } catch (error) {
-    console.error("Error al guardar en KV:", error);
-  }
+ // GUARDAR CONSULTA EN LA BASE DE DATOS
+    try {
+      const idPedido = `pedido-${Date.now()}`;
+      await kv.set(idPedido, {  // <--- Agregá el 'await' acá
+        cliente: activeQuote?.clientName || 'Cliente General',
+        origen: activeQuote?.origin?.address || 'No especificado',
+        destino: activeQuote?.destination?.address || 'No especificado',
+        monto: activeQuote?.shippingFee || 0,
+        metodoPago: paymentMethod,
+        fecha: new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' })
+      });
+      console.log("Pedido guardado correctamente");
+    } catch (error) {
+      console.error("Error al guardar en KV:", error);
+    }
     window.open(`https://wa.me/5492494522832?text=${encodeURIComponent(mensajeFinal)}`, '_blank');
   };
 
