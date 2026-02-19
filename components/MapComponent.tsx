@@ -22,7 +22,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ origin, destination, routeG
   useEffect(() => {
     if (mapRef.current && !leafletMap.current) {
       leafletMap.current = L.map(mapRef.current, {
-        zoomControl: false // Quitamos el default para ponerlo personalizado si se requiere o dejarlo limpio
+        zoomControl: false
       }).setView(TANDIL_COORDS, 14);
       
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -31,7 +31,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ origin, destination, routeG
 
       L.control.zoom({ position: 'bottomright' }).addTo(leafletMap.current);
 
-      // Control de Brújula personalizado
       const CompassControl = L.Control.extend({
         onAdd: function() {
           const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
